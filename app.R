@@ -81,7 +81,7 @@ server <- function(input, output) {
     if(input$disp == "head") { head(df) } 
       else if(input$disp == "tail") { tail(df) }
       else { df }
-  })
+  }, rownames = TRUE)
 
   
   output$table <- renderTable({
