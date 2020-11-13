@@ -29,9 +29,12 @@ ui <- fluidPage(
       br(),
 
       radioButtons("dec", "Decimal",
-                   choices = c("Dot" = '.', "Comma" = ","),
+                   choices = c(Dot = ".", Comma = ","),
                    selected = '.', 
                    inline = TRUE),
+      br(),
+
+      textInput("miss", "Missing", value = "NA", width = 200),
       br(),
 
       radioButtons("header", "Header", 
@@ -69,7 +72,7 @@ ui <- fluidPage(
           p(strong(em(h4("How to use this application:", style = "color:blue")))),
           hr(),         
           p(strong("UPLOAD:"), "By clicking 'Browse', you can select the data file in your computer. 
-            and then upload the data files with the extention of '.txt' or '.csv'."),
+            And, then, upload the data files with the extention of '.txt' or '.csv'."),
           br(),
           p(strong("SEPARATOR:"), "Select the separator symbol of your dataset. 
             It can be 'tab (\t)', 'column (,)', 'semicolon (;)' or 'space(' ')'. 
@@ -81,12 +84,18 @@ ui <- fluidPage(
           p(strong("DECIMAL:"), "If there are decimal values in your dataset, you should define the decimal character. 
             It can be 'comma (,)' or 'dot (.)'. 
             If you select the correct one, you can see your decimal values with dot in the right-side area."),
-          br(),    
+          br(),  
+          p(strong("MISSING:"), "If there are some missings in your data, you should define which symbol you use for these missings. 
+            As a recommendation, you prefer to use 'NA'."),
+          br(),   
           p(strong("HEADER:"), "If there is a head-line in your dataset, you should select 'TRUE', otherwise 'FALSE'.
             You can test this by considering the display at the right-side area."),
           br(),      
           p(strong("DISPLAY:"), "You can display your dataset with just first rows or last rows. 
-            Or you can display all rows of your dataset.")
+            Or you can display all rows of your dataset."),
+          br(),      
+          p(strong("PANELS:"), "In first panel 'Dataset', you can see your dataset. The second one 'Descriptives', you can see the table 
+            of some descriptive statistics of the numerical variables in your dataset.")
         )
 
       )
@@ -113,6 +122,7 @@ server <- function(input, output, session) {
                        header = ifelse(input$header == "TRUE", TRUE, FALSE),
                        sep = input$sep,
                        quote = input$quote,
+                       na.strings = input$miss,
                        stringsAsFactors = TRUE,
                        dec = input$dec)
       },
@@ -140,21 +150,22 @@ server <- function(input, output, session) {
     req(input$file1)
 
     fdesc <- function(x) {
-      n = length(x)
+      y = na.omit(x)
+      n = length(y)
       missing = sum(is.na(x))
-      m = mean(x)
-      s = sd(x)
-      var = var(x)
-      median = median(x)
-      min = quantile(x)[[1]]
-      Q1 = quantile(x)[2]
-      Q2 = quantile(x)[3]
-      Q3 = quantile(x)[4]
-      max = quantile(x)[[5]]
-      IQR = IQR(x)
-      mad = mad(x)
-      skew = sum((x-m)^3/s^3)/n		
-      kurt = sum((x-m)^4/s^4)/n - 3
+      m = mean(y)
+      s = sd(y)
+      var = var(y)
+      median = median(y)
+      min = quantile(y)[[1]]
+      Q1 = quantile(y)[2]
+      Q2 = quantile(y)[3]
+      Q3 = quantile(y)[4]
+      max = quantile(y)[[5]]
+      IQR = IQR(y)
+      mad = mad(y)
+      skew = sum((y-m)^3/s^3)/n		
+      kurt = sum((y-m)^4/s^4)/n - 3
 
       return(c(n = n, missing = missing,
                mean = m, sd = s, var = var, 
