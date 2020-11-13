@@ -194,7 +194,7 @@ server <- function(input, output, session) {
     }
     if(sum(sort(df2[,1]) == 1:k2) < k2) df3 <- df2
 
-    des <- sapply(df3, fdesc)
+    des <- sapply(na.omit(df3), fdesc)
 
   }, rownames = TRUE, digits = 2, bordered = TRUE, striped = TRUE, hover = TRUE)
 
